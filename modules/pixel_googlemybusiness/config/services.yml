@@ -1,0 +1,5 @@
+services:
+  pixel.google_my_business.import_place:
+    class: Pixel\Module\GoogleMyBusiness\Command\ImportPlace
+    tags:
+      - { name: 'console.command' }
