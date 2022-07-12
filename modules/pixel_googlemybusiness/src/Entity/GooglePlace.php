@@ -30,6 +30,13 @@ class GooglePlace
     /**
      * @var string
      *
+     * @ORM\Column(name="name", type="text", nullable=true)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="opening_hours_periods", type="text", nullable=true)
      */
     private $openingHoursPeriods;
@@ -91,6 +98,26 @@ class GooglePlace
     public function setPlaceId(string $placeId): GooglePlace
     {
         $this->placeId = $placeId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return GooglePlace
+     */
+    public function setName(string $name): GooglePlace
+    {
+        $this->name = $name;
 
         return $this;
     }

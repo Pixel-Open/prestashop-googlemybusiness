@@ -4,7 +4,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Doctrine\ORM\EntityManager;
+use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
+use Pixel\Module\GoogleMyBusiness\Entity\GooglePlace;
 
 class Pixel_googlemybusiness extends Module implements WidgetInterface
 {
@@ -20,11 +23,12 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $this->author = 'Pixel';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
+        $this->bootstrap = true;
 
         parent::__construct();
 
-        $this->displayName = $this->l('Google My Business');
-        $this->description = $this->l('Retrieve and display the Google My Business place data.');
+        $this->displayName = $this->trans('Google My Business', [], 'Modules.Pixelgooglemybusiness.Admin');
+        $this->description = $this->trans('Retrieve and display the Google My Business place data.', [], 'Modules.Pixelgooglemybusiness.Admin');
         $this->ps_versions_compliancy = [
             'min' => '1.7.6.0',
             'max' => _PS_VERSION_,
@@ -38,7 +42,19 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     public function install(): bool
     {
-        return parent::install() && $this->createTables() && $this->registerHook('displayHome');
+        return parent::install() &&
+            $this->createTables() &&
+            $this->registerHook('actionFrontControllerSetMedia');
+    }
+
+    /**
+     * Add CSS
+     *
+     * @return void
+     */
+    public function hookActionFrontControllerSetMedia()
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/gmb.css');
     }
 
     /**
@@ -46,7 +62,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     public function uninstall(): bool
     {
-        return parent::uninstall() && $this->deleteTables();
+        return parent::uninstall() && $this->deleteTables() && $this->deleteConfigurations();
     }
 
     /**
@@ -66,13 +82,43 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
 
     /**
      * @param string $hookName
-     * @param array $configuration
+     * @param mixed[] $configuration
      *
-     * @return mixed[]
+     * @return Object[]
+     * @throws ContainerNotFoundException
      */
     public function getWidgetVariables($hookName, array $configuration): array
     {
-        return [];
+        $placeIds = array_filter(
+            explode(',', $configuration['place_ids'] ?? '')
+        );
+
+        return [
+            'places' => $this->getPlaces($placeIds)
+        ];
+    }
+
+    /**
+     * Retrieve places
+     *
+     * @param string[] $placesIds
+     *
+     * @return Object[]
+     * @throws ContainerNotFoundException
+     */
+    protected function getPlaces(array $placesIds = []): array
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+
+        $repository = $entityManager->getRepository(GooglePlace::class);
+
+        $criteria = [];
+        if (!empty($placesIds)) {
+            $criteria['placeId'] = $placesIds;
+        }
+
+        return $repository->findBy($criteria);
     }
 
     /**
@@ -85,17 +131,18 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         return [
             'GOOGLE_MY_BUSINESS_API_KEY' => [
                 'type'     => 'text',
-                'label'    => $this->l('Google API Key'),
+                'label'    => $this->trans('Google API Key', [], 'Modules.Pixelgooglemybusiness.Admin'),
                 'name'     => 'GOOGLE_MY_BUSINESS_API_KEY',
                 'size'     => 20,
-                'required' => true
+                'required' => true,
             ],
-            'GOOGLE_MY_BUSINESS_PLACE_ID' => [
-                'type'     => 'text',
-                'label'    => $this->l('Google Place ID'),
-                'name'     => 'GOOGLE_MY_BUSINESS_PLACE_ID',
+            'GOOGLE_MY_BUSINESS_PLACE_IDS' => [
+                'type'     => 'textarea',
+                'label'    => $this->trans('Google Place IDs', [], 'Modules.Pixelgooglemybusiness.Admin'),
+                'name'     => 'GOOGLE_MY_BUSINESS_PLACE_IDS',
                 'size'     => 20,
-                'required' => true
+                'required' => true,
+                'desc'     => $this->trans('One place id per line', [], 'Modules.Pixelgooglemybusiness.Admin'),
             ]
         ];
     }
@@ -113,12 +160,12 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
             foreach ($this->getConfigFields() as $field) {
                 $value = (string) Tools::getValue($field['name']);
                 if ($field['required'] && empty($value)) {
-                    return $this->displayError($this->l($field['label'] . ' is empty')) . $this->displayForm();
+                    return $this->displayError($this->trans('%field% is empty', ['%field%' => $field['label']], 'Modules.Pixelgooglemybusiness.Admin')) . $this->displayForm();
                 }
                 Configuration::updateValue($field['name'], $value);
             }
 
-            $output = $this->displayConfirmation($this->l('Settings updated'));
+            $output = $this->displayConfirmation($this->trans('Settings updated', [], 'Modules.Pixelgooglemybusiness.Admin'));
         }
 
         return $output . $this->displayForm();
@@ -134,11 +181,11 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $form = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Settings'),
+                    'title' => $this->trans('Settings', [], 'Modules.Pixelgooglemybusiness.Admin'),
                 ],
                 'input' => $this->getConfigFields(),
                 'submit' => [
-                    'title' => $this->l('Save'),
+                    'title' => $this->trans('Save', [], 'Modules.Pixelgooglemybusiness.Admin'),
                     'class' => 'btn btn-default pull-right',
                 ],
             ],
@@ -171,25 +218,52 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     {
         return (bool)Db::getInstance()->execute('
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_place` (
-                id INT AUTO_INCREMENT NOT NULL,
-                place_id VARCHAR(255) NOT NULL,
-                opening_hours_periods TEXT DEFAULT NULL,
-                opening_hours_weekday_text TEXT DEFAULT NULL,
-                rating NUMERIC(4, 2) DEFAULT NULL,
-                user_ratings_total INT DEFAULT NULL,
-                PRIMARY KEY(id),
-                UNIQUE KEY(place_id)
+                `id` INT AUTO_INCREMENT NOT NULL,
+                `place_id` VARCHAR(255) NOT NULL,
+                `name` VARCHAR(255) NOT NULL,
+                `opening_hours_periods` TEXT DEFAULT NULL,
+                `opening_hours_weekday_text` TEXT DEFAULT NULL,
+                `rating` NUMERIC(4, 2) DEFAULT NULL,
+                `user_ratings_total` INT DEFAULT NULL,
+                PRIMARY KEY(`id`),
+                UNIQUE KEY(`place_id`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
         ');
     }
 
     /**
      * Delete tables
+     *
+     * @return bool
      */
-    protected function deleteTables():  bool
+    protected function deleteTables(): bool
     {
         return (bool)Db::getInstance()->execute('
             DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_place`;
         ');
+    }
+
+    /**
+     * Delete configurations
+     *
+     * @return bool
+     */
+    protected function deleteConfigurations(): bool
+    {
+        foreach ($this->getConfigFields() as $key => $options) {
+            Configuration::deleteByName($key);
+        }
+
+        return true;
+    }
+
+    /**
+     * Use the new translation system
+     *
+     * @return bool
+     */
+    public function isUsingNewTranslationSystem(): bool
+    {
+        return true;
     }
 }

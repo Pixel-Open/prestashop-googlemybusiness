@@ -36,43 +36,54 @@ class ImportPlace extends Command
         global $kernel;
 
         $apiUrl  = 'https://maps.googleapis.com/maps/api/place/details/json';
-        $placeId = Configuration::get('GOOGLE_MY_BUSINESS_PLACE_ID');
-        $params  = [
-            'fields'  => 'rating,opening_hours,user_ratings_total',
-            'key'     => Configuration::get('GOOGLE_MY_BUSINESS_API_KEY'),
-            'placeid' => $placeId,
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $apiUrl . '?' . http_build_query($params));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-        $response = json_decode(curl_exec($ch), true);
-
-        if (($status = $response['status'] ?? 'CANNOT REACH API') !== 'OK') {
-            $output->write($status);
+        $placeIds = Configuration::get('GOOGLE_MY_BUSINESS_PLACE_IDS');
+        if (!$placeIds) {
+            $output->write('No places to import' . "\n");
             return;
         }
+        $placeIds = preg_split('/\r\n|[\r\n]/', $placeIds);
 
-        $result = $response['result'];
+        foreach ($placeIds as $placeId) {
+            $params = [
+                'fields' => 'name,rating,opening_hours,user_ratings_total',
+                'key' => Configuration::get('GOOGLE_MY_BUSINESS_API_KEY'),
+                'placeid' => $placeId,
+            ];
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $apiUrl . '?' . http_build_query($params));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        $repository = $entityManager->getRepository(GooglePlace::class);
+            $response = json_decode(curl_exec($ch), true);
 
-        /** @var GooglePlace|null $place */
-        $googlePlace = $repository->findOneBy(['placeId' => $placeId]) ?: new GooglePlace();
-        $googlePlace
-            ->setPlaceId($placeId)
-            ->setOpeningHoursPeriods(json_encode($result['opening_hours']['periods'] ?? []))
-            ->setOpeningHoursWeekdayText(json_encode($result['opening_hours']['weekday_text'] ?? []))
-            ->setRating((float)($result['rating'] ?? 5))
-            ->setUserRatingsTotal((int)($result['user_ratings_total'] ?? 0));
+            if (($status = $response['status'] ?? 'CANNOT REACH API') !== 'OK') {
+                $output->write($placeId . ' - ' . $status . "\n");
+                continue;
+            }
 
-        $entityManager->persist($googlePlace);
-        $entityManager->flush();
+            $result = $response['result'];
 
-        $output->write('Import done!');
+            /** @var EntityManager $entityManager */
+            $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+
+            $repository = $entityManager->getRepository(GooglePlace::class);
+
+            /** @var GooglePlace|null $place */
+            $googlePlace = $repository->findOneBy(['placeId' => $placeId]) ?: new GooglePlace();
+            $googlePlace
+                ->setPlaceId($placeId)
+                ->setName($result['name'])
+                ->setOpeningHoursPeriods(json_encode($result['opening_hours']['periods'] ?? []))
+                ->setOpeningHoursWeekdayText(json_encode($result['opening_hours']['weekday_text'] ?? []))
+                ->setRating((float)($result['rating'] ?? 5))
+                ->setUserRatingsTotal((int)($result['user_ratings_total'] ?? 0));
+
+            $entityManager->persist($googlePlace);
+            $entityManager->flush();
+
+            $output->write($placeId . ' - OK' . "\n");
+        }
+
+        $output->write('Import done!' . "\n");
     }
 }

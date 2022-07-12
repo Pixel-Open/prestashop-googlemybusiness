@@ -1,0 +1,13 @@
+.google-places .place {
+    margin: 1.25rem 0;
+}
+
+.google-places .place .name {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.google-places .place .rating {
+    margin-bottom: 1rem;
+}
