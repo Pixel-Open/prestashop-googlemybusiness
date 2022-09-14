@@ -30,7 +30,11 @@ At the command prompt, go to the Prestashop root directory and  execute the foll
 ./bin/console google_my_business:import_place {language}
 ```
 
-- *language*: ISO 639-1 (en, de, fr...) 
+- *language*: ISO 639-1 (en, de, fr...)
+
+## Reviews
+
+It is only possible to retrieve the last 5 reviews. Import often to accumulate the reviews.
 
 ## Display
 

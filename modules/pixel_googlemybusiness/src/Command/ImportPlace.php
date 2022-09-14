@@ -49,10 +49,11 @@ class ImportPlace extends Command
 
         foreach ($placeIds as $placeId) {
             $params = [
-                'fields'   => 'name,rating,opening_hours,user_ratings_total,reviews',
-                'key'      => Configuration::get('GOOGLE_MY_BUSINESS_API_KEY'),
-                'placeid'  => $placeId,
-                'language' => $language,
+                'fields'       => 'name,rating,opening_hours,user_ratings_total,reviews',
+                'reviews_sort' => 'newest',
+                'key'          => Configuration::get('GOOGLE_MY_BUSINESS_API_KEY'),
+                'placeid'      => $placeId,
+                'language'     => $language,
             ];
 
             $ch = curl_init();
@@ -71,6 +72,7 @@ class ImportPlace extends Command
             /** @var EntityManager $entityManager */
             $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
 
+            /* Add place */
             $repository = $entityManager->getRepository(GooglePlace::class);
 
             /** @var GooglePlace|null $place */
@@ -87,22 +89,28 @@ class ImportPlace extends Command
             $entityManager->persist($googlePlace);
             $entityManager->flush();
 
+            /* Add last reviews */
             $repository = $entityManager->getRepository(GoogleReview::class);
-            $reviews = $repository->findBy(['placeId' => $placeId, 'language' => $language]);
-            /** @var GoogleReview $review */
-            foreach ($reviews as $review) {
-                $entityManager->remove($review);
-            }
 
             foreach (($result['reviews'] ?? []) as $review) {
+                $exists = $repository->findOneBy(
+                    [
+                        'placeId' => $placeId,
+                        'time'    => $review['time'],
+                    ]
+                );
+                if ($exists) {
+                    continue;
+                }
+
                 $googleReview = new GoogleReview();
                 $googleReview
                     ->setPlaceId($placeId)
                     ->setAuthorName($review['author_name'])
-                    ->setLanguage($review['language'])
-                    ->setOriginalLanguage($review['original_language'])
+                    ->setLanguage($review['language'] ?? null)
+                    ->setOriginalLanguage($review['original_language'] ?? null)
                     ->setProfilePhotoUrl($review['profile_photo_url'])
-                    ->setRelativeTimeDescription($review['relative_time_description'])
+                    ->setRating((int)$review['rating'])
                     ->setComment($this->removeEmoji($review['text']))
                     ->setTime((int)$review['time'])
                     ->setTranslated((bool)$review['translated'])

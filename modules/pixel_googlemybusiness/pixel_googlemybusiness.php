@@ -114,7 +114,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $repository = $entityManager->getRepository(GooglePlace::class);
 
         $criteria = [
-            'language' => $this->context->language->iso_code,
+            'language' => [$this->context->language->iso_code, null],
         ];
         if (!empty($placesIds)) {
             $criteria['placeId']  = $placesIds;
@@ -222,7 +222,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_place` (
                 `id` INT(11) AUTO_INCREMENT NOT NULL,
                 `place_id` VARCHAR(255) NOT NULL,
-                `language` VARCHAR(2) NOT NULL,
+                `language` VARCHAR(2) NULL,
                 `name` VARCHAR(255) NOT NULL,
                 `opening_hours_periods` TEXT DEFAULT NULL,
                 `opening_hours_weekday_text` TEXT DEFAULT NULL,
@@ -236,14 +236,16 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 `id` INT(11) AUTO_INCREMENT NOT NULL,
                 `place_id` VARCHAR(255) NOT NULL,
                 `author_name` VARCHAR(255) DEFAULT NULL,
-                `language` VARCHAR(2) NOT NULL,
+                `language` VARCHAR(2) NULL,
                 `original_language` VARCHAR(2) DEFAULT NULL,
                 `profile_photo_url` VARCHAR(255) DEFAULT NULL,
+                `rating` SMALLINT DEFAULT NULL,
                 `relative_time_description` VARCHAR(255) DEFAULT NULL,
                 `comment` LONGTEXT DEFAULT NULL,
                 `time` INT DEFAULT NULL,
                 `translated` TINYINT(1) DEFAULT NULL,
                 `enabled` TINYINT(1) DEFAULT NULL,
+                KEY INDEX_PLACE_ID_TIME (`place_id`, `time`),
                 PRIMARY KEY(`id`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
         ');

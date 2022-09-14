@@ -31,7 +31,7 @@ class GooglePlace
     /**
      * @var string
      *
-     * @ORM\Column(name="language", type="string", length=2, nullable=false)
+     * @ORM\Column(name="language", type="string", length=2, nullable=true)
      */
     private $language;
 

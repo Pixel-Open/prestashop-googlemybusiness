@@ -37,7 +37,7 @@ class GoogleReview
     /**
      * @var string
      *
-     * @ORM\Column(name="language", type="string", length=2, nullable=false)
+     * @ORM\Column(name="language", type="string", length=2, nullable=true)
      */
     private $language;
 
@@ -54,6 +54,13 @@ class GoogleReview
      * @ORM\Column(name="profile_photo_url", type="string", length=255, nullable=true)
      */
     private $profilePhotoUrl;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="rating", type="smallint", nullable=true)
+     */
+    private $rating;
 
     /**
      * @var string
@@ -206,6 +213,26 @@ class GoogleReview
     public function setProfilePhotoUrl(?string $profilePhotoUrl): GoogleReview
     {
         $this->profilePhotoUrl = $profilePhotoUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRating(): ?int
+    {
+        return $this->rating;
+    }
+
+    /**
+     * @param int|null $rating
+     *
+     * @return GoogleReview
+     */
+    public function setRating(?int $rating): GoogleReview
+    {
+        $this->rating = $rating;
 
         return $this;
     }
