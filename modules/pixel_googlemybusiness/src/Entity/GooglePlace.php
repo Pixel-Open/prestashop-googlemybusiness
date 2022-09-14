@@ -4,6 +4,7 @@ namespace Pixel\Module\GoogleMyBusiness\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Table()
@@ -23,9 +24,16 @@ class GooglePlace
     /**
      * @var string
      *
-     * @ORM\Column(name="place_id", type="string", length=255, unique=true)
+     * @ORM\Column(name="place_id", type="string", length=255, nullable=false)
      */
     private $placeId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="language", type="string", length=2, nullable=false)
+     */
+    private $language;
 
     /**
      * @var string
@@ -98,6 +106,26 @@ class GooglePlace
     public function setPlaceId(string $placeId): GooglePlace
     {
         $this->placeId = $placeId;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string|null $language
+     *
+     * @return GoogleReview
+     */
+    public function setLanguage(?string $language): GooglePlace
+    {
+        $this->language = $language;
 
         return $this;
     }

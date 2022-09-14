@@ -27,8 +27,10 @@ From the module manager, find the module and click on configure.
 At the command prompt, go to the Prestashop root directory and  execute the following command:
 
 ```bash
-./bin/console google_my_business:import_place
+./bin/console google_my_business:import_place {language}
 ```
+
+- *language*: ISO 639-1 (en, de, fr...) 
 
 ## Display
 
@@ -43,6 +45,8 @@ Filter by place id with the `place_ids` widget param (comma separated):
 ```smarty
 {widget name='pixel_googlemybusiness' place_ids='ChIJLU7jZClu5kcR4PcOOO6p3I0'}
 ```
+
+**Note:** Only places imported in the current context language will be displayed
 
 ## Translations
 

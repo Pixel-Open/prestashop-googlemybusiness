@@ -113,9 +113,11 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
 
         $repository = $entityManager->getRepository(GooglePlace::class);
 
-        $criteria = [];
+        $criteria = [
+            'language' => $this->context->language->iso_code,
+        ];
         if (!empty($placesIds)) {
-            $criteria['placeId'] = $placesIds;
+            $criteria['placeId']  = $placesIds;
         }
 
         return $repository->findBy($criteria);
@@ -218,15 +220,31 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     {
         return (bool)Db::getInstance()->execute('
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_place` (
-                `id` INT AUTO_INCREMENT NOT NULL,
+                `id` INT(11) AUTO_INCREMENT NOT NULL,
                 `place_id` VARCHAR(255) NOT NULL,
+                `language` VARCHAR(2) NOT NULL,
                 `name` VARCHAR(255) NOT NULL,
                 `opening_hours_periods` TEXT DEFAULT NULL,
                 `opening_hours_weekday_text` TEXT DEFAULT NULL,
                 `rating` NUMERIC(4, 2) DEFAULT NULL,
                 `user_ratings_total` INT DEFAULT NULL,
                 PRIMARY KEY(`id`),
-                UNIQUE KEY(`place_id`)
+                UNIQUE KEY(`place_id`, `language`)
+            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
+            
+            CREATE TABLE `' . _DB_PREFIX_ . 'google_review` (
+                `id` INT(11) AUTO_INCREMENT NOT NULL,
+                `place_id` VARCHAR(255) NOT NULL,
+                `author_name` VARCHAR(255) DEFAULT NULL,
+                `language` VARCHAR(2) NOT NULL,
+                `original_language` VARCHAR(2) DEFAULT NULL,
+                `profile_photo_url` VARCHAR(255) DEFAULT NULL,
+                `relative_time_description` VARCHAR(255) DEFAULT NULL,
+                `comment` LONGTEXT DEFAULT NULL,
+                `time` INT DEFAULT NULL,
+                `translated` TINYINT(1) DEFAULT NULL,
+                `enabled` TINYINT(1) DEFAULT NULL,
+                PRIMARY KEY(`id`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
         ');
     }
@@ -240,6 +258,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     {
         return (bool)Db::getInstance()->execute('
             DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_place`;
+            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_review`;
         ');
     }
 
