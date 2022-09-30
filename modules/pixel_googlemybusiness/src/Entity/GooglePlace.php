@@ -71,6 +71,11 @@ class GooglePlace
     private $userRatingsTotal;
 
     /**
+     * @var GoogleReview[]
+     */
+    private $reviews = [];
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -231,6 +236,26 @@ class GooglePlace
     }
 
     /**
+     * @return GoogleReview[]
+     */
+    public function getReviews(): array
+    {
+        return $this->reviews;
+    }
+
+    /**
+     * @param GoogleReview[] $reviews
+     *
+     * @return GooglePlace
+     */
+    public function setReviews(array $reviews): GooglePlace
+    {
+        $this->reviews = $reviews;
+
+        return $this;
+    }
+
+    /**
      * @return mixed[]
      */
     public function toArray(): array
@@ -242,6 +267,7 @@ class GooglePlace
             'opening_hours_weekday_text' => $this->getOpeningHoursWeekdayText(),
             'rating' => $this->getRating(),
             'user_ratings_total' => $this->getUserRatingsTotal(),
+            'reviews' => $this->getReviews(),
         ];
     }
 }

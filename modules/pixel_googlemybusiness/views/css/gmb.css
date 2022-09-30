@@ -11,3 +11,21 @@
 .google-places .place .rating {
     margin-bottom: 1rem;
 }
+
+.google-places .place .review {
+    padding: 0 1rem;
+    border: 1px solid #ccc;
+    margin: 1rem 0;
+}
+
+.google-places .place .review .author {
+    font-weight: bold;
+}
+
+.google-places .place .review .author,
+.google-places .place .review .date,
+.google-places .place .review .note,
+.google-places .place .review .comment {
+    display: block;
+    margin: .5rem 0;
+}

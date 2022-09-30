@@ -41,13 +41,37 @@ It is only possible to retrieve the last 5 reviews. Import often to accumulate t
 In any template, add the following Widget:
 
 ```smarty
-{widget name='pixel_googlemybusiness'}
+{widget name='pixel_googlemybusiness' display='name,rating,opening-hours,reviews'}
 ```
+
+**Display excepted options:**
+
+* name: Place name (Eiffel tower)
+* rating: Average Rating (4/5)
+* opening-hours: Opening hours (Monday: 12:00 – 19:00, Tuesday: 10:00 – 19:00...)
+* review: the last reviews
+
+For example, to display only reviews:
+
+```smarty
+{widget name='pixel_googlemybusiness' display='reviews'}
+```
+
+**Review filters:**
+
+* review_number: the number of review to display
+* review_min_rating: only show reviews with rating greater or equal than this value
+
+```smarty
+{widget name='pixel_googlemybusiness' display='reviews' review_number=5 review_min_rating=3}
+```
+
+**Place filter:**
 
 Filter by place id with the `place_ids` widget param (comma separated):
 
 ```smarty
-{widget name='pixel_googlemybusiness' place_ids='ChIJLU7jZClu5kcR4PcOOO6p3I0'}
+{widget name='pixel_googlemybusiness' place_ids='ChIJLU7jZClu5kcR4PcOOO6p3I0' display='name,rating,opening-hours,reviews'}
 ```
 
 **Note:** Only places imported in the current context language will be displayed

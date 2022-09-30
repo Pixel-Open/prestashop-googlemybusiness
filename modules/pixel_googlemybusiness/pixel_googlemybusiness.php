@@ -4,10 +4,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use PrestaShop\PrestaShop\Core\Exception\ContainerNotFoundException;
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 use Pixel\Module\GoogleMyBusiness\Entity\GooglePlace;
+use Pixel\Module\GoogleMyBusiness\Entity\GoogleReview;
 
 class Pixel_googlemybusiness extends Module implements WidgetInterface
 {
@@ -92,9 +95,20 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $placeIds = array_filter(
             explode(',', $configuration['place_ids'] ?? '')
         );
+        $display = array_filter(
+            explode(',', $configuration['display'] ?? 'name,rating,opening-hours,reviews')
+        );
+        $reviewNumber = $configuration['review_number'] ?? 5;
+        $reviewMinRating = $configuration['review_min_rating'] ?? 0;
 
         return [
-            'places' => $this->getPlaces($placeIds)
+            'places'  => $this->getPlaces(
+                $placeIds,
+                in_array('reviews', $display),
+                (int)$reviewNumber,
+                (int)$reviewMinRating
+            ),
+            'display' => $display,
         ];
     }
 
@@ -106,12 +120,17 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      * @return Object[]
      * @throws ContainerNotFoundException
      */
-    protected function getPlaces(array $placesIds = []): array
-    {
+    protected function getPlaces(
+        array $placesIds = [],
+        bool $loadReviews = true,
+        int $reviewNumber = 5,
+        int $reviewMinRating = 0
+    ): array {
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        $repository = $entityManager->getRepository(GooglePlace::class);
+        $placeRepository  = $entityManager->getRepository(GooglePlace::class);
+        $reviewRepository = $entityManager->getRepository(GoogleReview::class);
 
         $criteria = [
             'language' => [$this->context->language->iso_code, null],
@@ -120,7 +139,40 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
             $criteria['placeId']  = $placesIds;
         }
 
-        return $repository->findBy($criteria);
+        $places = $placeRepository->findBy($criteria);
+
+        if ($loadReviews) {
+            /** @var GooglePlace $place */
+            foreach ($places as $place) {
+                $language = new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        Criteria::expr()->eq('language', $this->context->language->iso_code),
+                        Criteria::expr()->eq('language', null)
+                    ]
+                );
+                $filters = new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        $language,
+                        Criteria::expr()->eq('placeId', $place->getPlaceId()),
+                        Criteria::expr()->eq('enabled', 1),
+                        Criteria::expr()->gte('rating', $reviewMinRating),
+                    ]
+                );
+
+                $criteria = Criteria::create()
+                    ->where($filters)
+                    ->orderBy(['time' => Criteria::DESC])
+                    ->setMaxResults($reviewNumber);
+
+                $reviews = $reviewRepository->matching($criteria)->getValues();
+
+                $place->setReviews($reviews);
+            }
+        }
+
+        return $places;
     }
 
     /**
