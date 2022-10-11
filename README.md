@@ -1,5 +1,7 @@
 # Pixel GoogleMyBusiness
 
+## Presentation
+
 GoogleMyBusiness is a Prestashop module to import and display any Google place data on the frontend.
 
 ![Place display](screenshot.png)
