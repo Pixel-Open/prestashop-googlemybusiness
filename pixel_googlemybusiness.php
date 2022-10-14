@@ -22,8 +22,8 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'pixel_googlemybusiness';
-        $this->version = '1.0.0';
-        $this->author = 'Pixel';
+        $this->version = '1.0.1';
+        $this->author = 'Pixel Open';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
         $this->bootstrap = true;
