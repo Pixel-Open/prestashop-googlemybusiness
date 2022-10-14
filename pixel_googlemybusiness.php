@@ -76,11 +76,14 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     public function renderWidget($hookName, array $configuration): string
     {
-        if (!$this->isCached($this->templateFile, $this->getCacheId($this->name))) {
+        $keys = [$this->name, md5(serialize($configuration))];
+        $cacheId = join('_', $keys);
+
+        if (!$this->isCached($this->templateFile, $cacheId)) {
             $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
         }
 
-        return $this->fetch($this->templateFile, $this->getCacheId($this->name));
+        return $this->fetch($this->templateFile, $cacheId);
     }
 
     /**
