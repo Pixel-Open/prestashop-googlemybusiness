@@ -13,7 +13,17 @@ GoogleMyBusiness is a Prestashop module to import and display any Google place d
 
 ## Installation
 
-Copy the `pixel_googlemybusiness` directory into the Prestashop `modules` directory.
+## Installation
+
+Download the **pixel_googlemybusiness.zip** file from the [last release](https://github.com/Pixel-Open/prestashop-googlemybusiness/releases/latest) assets.
+
+### Admin
+
+Go to the admin module catalog section and click **Upload a module**. Select the downloaded zip file.
+
+### Manually
+
+Move the downloaded file in the Prestashop **modules** directory and unzip the archive. Go to the admin module catalog section and search for "Google My Business".
 
 ## Configuration
 
