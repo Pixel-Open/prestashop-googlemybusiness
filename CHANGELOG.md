@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Custom widget template
+
 ## 1.0.2
 
 - Folders protection

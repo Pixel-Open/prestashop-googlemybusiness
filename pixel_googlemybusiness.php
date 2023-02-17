@@ -22,7 +22,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'pixel_googlemybusiness';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->author = 'Pixel Open';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
@@ -73,17 +73,20 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      * @param array $configuration
      *
      * @return string
+     * @throws ContainerNotFoundException
      */
     public function renderWidget($hookName, array $configuration): string
     {
         $keys = [$this->name, md5(serialize($configuration))];
         $cacheId = join('_', $keys);
 
-        if (!$this->isCached($this->templateFile, $cacheId)) {
+        $template = $configuration['template'] ?? $this->templateFile;
+
+        if (!$this->isCached($template, $cacheId)) {
             $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
         }
 
-        return $this->fetch($this->templateFile, $cacheId);
+        return $this->fetch($template, $cacheId);
     }
 
     /**

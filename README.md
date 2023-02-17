@@ -90,6 +90,40 @@ Filter by place id with the `place_ids` widget param (comma separated):
 
 **Note:** Only places imported in the current context language will be displayed
 
+## Custom template
+
+You can create your own template to display places.
+
+Create a new template file in the **pixel_googlemybusiness** directory for your theme:
+
+*themes/{themeName}/modules/pixel_googlemybusiness/custom.tpl*
+
+```html
+{foreach from=$places item=place}
+    {$place->getPlaceId()}
+    {$place->getName()}
+    {$place->getRating()}
+    {$place->getUserRatingsTotal()}
+    {foreach from=$place->getOpeningHoursWeekdayText()|json_decode:1 item=hour}
+        {$hour}
+    {/foreach}
+    {foreach from=$place->getReviews() item=review}
+        {$review->getAuthorName()}
+        {$review->getTime()|date_format:"%e %B %Y"}
+        {$review->getRating()}
+        {if $review->getComment()}
+            {$review->getComment()}
+        {/if}
+    {/foreach}
+{/foreach}
+```
+
+Add the **template** option in the widget with the template path:
+
+```smarty
+{widget name='pixel_googlemybusiness' template='module:pixel_googlemybusiness/custom.tpl'}
+```
+
 ## Translations
 
 In admin, go to the **Translations** page under the **International** menu.
