@@ -294,6 +294,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 `id` INT(11) AUTO_INCREMENT NOT NULL,
                 `place_id` VARCHAR(255) NOT NULL,
                 `author_name` VARCHAR(255) DEFAULT NULL,
+                `author_url` VARCHAR(255) DEFAULT NULL,
                 `language` VARCHAR(2) NULL,
                 `original_language` VARCHAR(2) DEFAULT NULL,
                 `profile_photo_url` VARCHAR(255) DEFAULT NULL,

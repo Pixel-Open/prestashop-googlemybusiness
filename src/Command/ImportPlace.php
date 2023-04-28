@@ -107,6 +107,7 @@ class ImportPlace extends Command
                 $googleReview
                     ->setPlaceId($placeId)
                     ->setAuthorName($review['author_name'])
+                    ->setAuthorUrl($review['author_url'])
                     ->setLanguage($review['language'] ?? null)
                     ->setOriginalLanguage($review['original_language'] ?? null)
                     ->setProfilePhotoUrl($review['profile_photo_url'])
