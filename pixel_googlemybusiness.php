@@ -287,7 +287,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 `opening_hours_weekday_text` TEXT DEFAULT NULL,
                 `rating` NUMERIC(4, 2) DEFAULT NULL,
                 `user_ratings_total` INT DEFAULT NULL,
-                `price_evel` INT DEFAULT NULL,
+                `price_level` INT DEFAULT NULL,
                 PRIMARY KEY(`id`),
                 UNIQUE KEY(`place_id`, `language`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
