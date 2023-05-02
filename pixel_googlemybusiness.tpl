@@ -3,6 +3,9 @@
     <div class="place" itemscope itemtype="https://schema.org/Place">
         {if 'name'|in_array:$display}
             <div class="name" itemprop="name">{$place->getName()}</div>
+            <div><a href="tel:{$place->getPhone()}"><i
+                            class="material-icons">&#xE0B0;</i><span
+                            itemprop="telephone">{$place->getPhone()}</span></a></div>
         {/if}
         {if 'rating'|in_array:$display}
             <div class="rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">

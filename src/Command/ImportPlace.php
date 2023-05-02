@@ -81,10 +81,12 @@ class ImportPlace extends Command
                 ->setPlaceId($placeId)
                 ->setLanguage($language)
                 ->setName($result['name'])
+                ->setPhone($result['international_phone_number'])
                 ->setOpeningHoursPeriods(json_encode($result['opening_hours']['periods'] ?? []))
                 ->setOpeningHoursWeekdayText(json_encode($result['opening_hours']['weekday_text'] ?? []))
                 ->setRating((float)($result['rating'] ?? 5))
-                ->setUserRatingsTotal((int)($result['user_ratings_total'] ?? 0));
+                ->setUserRatingsTotal((int)($result['user_ratings_total'] ?? 0))
+                ->setPriceLevel((int)($result['price_level'] ?? 0));
 
             $entityManager->persist($googlePlace);
             $entityManager->flush();
