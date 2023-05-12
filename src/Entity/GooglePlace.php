@@ -172,7 +172,7 @@ class GooglePlace
     /**
      * @return string
      */
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
@@ -182,7 +182,7 @@ class GooglePlace
      *
      * @return GooglePlace
      */
-    public function setPhone(string $phone): GooglePlace
+    public function setPhone(?string $phone): GooglePlace
     {
         $this->phone = $phone;
 
@@ -317,11 +317,15 @@ class GooglePlace
         return [
             'id' => $this->getId(),
             'place_id' => $this->getPlaceId(),
+            'name' => $this->getName(),
+            'phone' => $this->getPhone(),
             'opening_hours_periods' => $this->getOpeningHoursPeriods(),
             'opening_hours_weekday_text' => $this->getOpeningHoursWeekdayText(),
             'rating' => $this->getRating(),
             'user_ratings_total' => $this->getUserRatingsTotal(),
             'reviews' => $this->getReviews(),
+            'price_level' => $this->getPriceLevel(),
+            'language' => $this->getLanguage(),
         ];
     }
 }

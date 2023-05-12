@@ -49,7 +49,7 @@ class ImportPlace extends Command
 
         foreach ($placeIds as $placeId) {
             $params = [
-                'fields'       => 'name,rating,opening_hours,user_ratings_total,reviews',
+                'fields'       => 'name,international_phone_number,rating,opening_hours,user_ratings_total,reviews,price_level',
                 'reviews_sort' => 'newest',
                 'key'          => Configuration::get('GOOGLE_MY_BUSINESS_API_KEY'),
                 'placeid'      => $placeId,
@@ -81,7 +81,7 @@ class ImportPlace extends Command
                 ->setPlaceId($placeId)
                 ->setLanguage($language)
                 ->setName($result['name'])
-                ->setPhone($result['international_phone_number'])
+                ->setPhone($result['international_phone_number'] ?? null)
                 ->setOpeningHoursPeriods(json_encode($result['opening_hours']['periods'] ?? []))
                 ->setOpeningHoursWeekdayText(json_encode($result['opening_hours']['weekday_text'] ?? []))
                 ->setRating((float)($result['rating'] ?? 5))
@@ -109,7 +109,7 @@ class ImportPlace extends Command
                 $googleReview
                     ->setPlaceId($placeId)
                     ->setAuthorName($review['author_name'])
-                    ->setAuthorUrl($review['author_url'])
+                    ->setAuthorUrl($review['author_url'] ?? '')
                     ->setLanguage($review['language'] ?? null)
                     ->setOriginalLanguage($review['original_language'] ?? null)
                     ->setProfilePhotoUrl($review['profile_photo_url'])
