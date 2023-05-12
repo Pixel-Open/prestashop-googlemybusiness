@@ -45,6 +45,13 @@ class GooglePlace
     /**
      * @var string
      *
+     * @ORM\Column(name="phone", type="text", nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="opening_hours_periods", type="text", nullable=true)
      */
     private $openingHoursPeriods;
@@ -69,6 +76,13 @@ class GooglePlace
      * @ORM\Column(name="user_ratings_total", type="integer", nullable=true)
      */
     private $userRatingsTotal;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="price_level", type="integer", nullable=true)
+     */
+    private $priceLevel;
 
     /**
      * @var GoogleReview[]
@@ -156,6 +170,26 @@ class GooglePlace
     }
 
     /**
+     * @return string
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string $phone
+     *
+     * @return GooglePlace
+     */
+    public function setPhone(?string $phone): GooglePlace
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getOpeningHoursPeriods(): ?string
@@ -236,6 +270,26 @@ class GooglePlace
     }
 
     /**
+     * @return int|null
+     */
+    public function getPriceLevel(): ?int
+    {
+        return $this->priceLevel;
+    }
+
+    /**
+     * @param int|null $priceLevel
+     *
+     * @return GooglePlace
+     */
+    public function setPriceLevel(?int $priceLevel): GooglePlace
+    {
+        $this->priceLevel = $priceLevel;
+
+        return $this;
+    }
+
+    /**
      * @return GoogleReview[]
      */
     public function getReviews(): array
@@ -263,11 +317,15 @@ class GooglePlace
         return [
             'id' => $this->getId(),
             'place_id' => $this->getPlaceId(),
+            'name' => $this->getName(),
+            'phone' => $this->getPhone(),
             'opening_hours_periods' => $this->getOpeningHoursPeriods(),
             'opening_hours_weekday_text' => $this->getOpeningHoursWeekdayText(),
             'rating' => $this->getRating(),
             'user_ratings_total' => $this->getUserRatingsTotal(),
             'reviews' => $this->getReviews(),
+            'price_level' => $this->getPriceLevel(),
+            'language' => $this->getLanguage(),
         ];
     }
 }

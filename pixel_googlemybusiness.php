@@ -22,7 +22,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'pixel_googlemybusiness';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Pixel Open';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
@@ -102,7 +102,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
             explode(',', $configuration['place_ids'] ?? '')
         );
         $display = array_filter(
-            explode(',', $configuration['display'] ?? 'name,rating,opening-hours,reviews')
+            explode(',', $configuration['display'] ?? 'name,phone,rating,opening-hours,reviews')
         );
         $reviewNumber = $configuration['review_number'] ?? 5;
         $reviewMinRating = $configuration['review_min_rating'] ?? 0;
@@ -282,10 +282,12 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 `place_id` VARCHAR(255) NOT NULL,
                 `language` VARCHAR(2) NULL,
                 `name` VARCHAR(255) NOT NULL,
+                `phone` VARCHAR(255) DEFAULT NULL,
                 `opening_hours_periods` TEXT DEFAULT NULL,
                 `opening_hours_weekday_text` TEXT DEFAULT NULL,
                 `rating` NUMERIC(4, 2) DEFAULT NULL,
                 `user_ratings_total` INT DEFAULT NULL,
+                `price_level` INT DEFAULT NULL,
                 PRIMARY KEY(`id`),
                 UNIQUE KEY(`place_id`, `language`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
@@ -294,6 +296,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 `id` INT(11) AUTO_INCREMENT NOT NULL,
                 `place_id` VARCHAR(255) NOT NULL,
                 `author_name` VARCHAR(255) DEFAULT NULL,
+                `author_url` VARCHAR(255) DEFAULT NULL,
                 `language` VARCHAR(2) NULL,
                 `original_language` VARCHAR(2) DEFAULT NULL,
                 `profile_photo_url` VARCHAR(255) DEFAULT NULL,

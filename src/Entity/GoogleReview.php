@@ -33,6 +33,12 @@ class GoogleReview
      * @ORM\Column(name="author_name", type="string", length=255, nullable=true)
      */
     private $authorName;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="author_url", type="string", length=255, nullable=true)
+     */
+    private $authorUrl;
 
     /**
      * @var string
@@ -153,6 +159,26 @@ class GoogleReview
     public function setAuthorName(?string $authorName): GoogleReview
     {
         $this->authorName = $authorName;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAuthorUrl(): ?string
+    {
+        return $this->authorUrl;
+    }
+
+    /**
+     * @param string|null $authorUrl
+     *
+     * @return GoogleReview
+     */
+    public function setAuthorUrl(?string $authorUrl): GoogleReview
+    {
+        $this->authorUrl = $authorUrl;
 
         return $this;
     }
@@ -346,6 +372,7 @@ class GoogleReview
             'id' => $this->getId(),
             'place_id' => $this->getPlaceId(),
             'author_name' => $this->getAuthorName(),
+            'author_url' => $this->getAuthorUrl(),
             'language' => $this->getLanguage(),
             'original_language' => $this->getOriginalLanguage(),
             'profile_photo_url' => $this->getProfilePhotoUrl(),

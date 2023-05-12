@@ -1,3 +1,9 @@
+## 1.0.4
+
+- Microdata added to template (@cdigruttola)
+- Phone and price level added to place (@cdigruttola)
+- Author URL added to review (@cdigruttola)
+
 ## 1.0.3
 
 - Custom widget template
