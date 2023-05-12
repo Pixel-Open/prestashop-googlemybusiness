@@ -8,6 +8,10 @@
     font-size: 1.1rem;
 }
 
+.google-places .place .phone {
+    margin-bottom: 1rem;
+}
+
 .google-places .place .rating {
     margin-bottom: 1rem;
 }
