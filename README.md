@@ -55,12 +55,13 @@ It is only possible to retrieve the last 5 reviews. Import often to accumulate t
 In any template, add the following Widget:
 
 ```smarty
-{widget name='pixel_googlemybusiness' display='name,rating,opening-hours,reviews'}
+{widget name='pixel_googlemybusiness' display='name,phone,rating,opening-hours,reviews'}
 ```
 
 **Display excepted options:**
 
 * name: Place name (Eiffel tower)
+* phone: International phone number (+33 1 22 33 44 55)
 * rating: Average Rating (4/5)
 * opening-hours: Opening hours (Monday: 12:00 – 19:00, Tuesday: 10:00 – 19:00...)
 * review: the last reviews
