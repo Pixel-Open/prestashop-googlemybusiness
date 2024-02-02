@@ -22,7 +22,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'pixel_googlemybusiness';
-        $this->version = '1.0.4';
+        $this->version = '1.1.0';
         $this->author = 'Pixel Open';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
@@ -276,40 +276,49 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     protected function createTables(): bool
     {
-        return (bool)Db::getInstance()->execute('
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_place` (
-                `id` INT(11) AUTO_INCREMENT NOT NULL,
-                `place_id` VARCHAR(255) NOT NULL,
-                `language` VARCHAR(2) NULL,
-                `name` VARCHAR(255) NOT NULL,
-                `phone` VARCHAR(255) DEFAULT NULL,
-                `opening_hours_periods` TEXT DEFAULT NULL,
-                `opening_hours_weekday_text` TEXT DEFAULT NULL,
-                `rating` NUMERIC(4, 2) DEFAULT NULL,
-                `user_ratings_total` INT DEFAULT NULL,
-                `price_level` INT DEFAULT NULL,
-                PRIMARY KEY(`id`),
-                UNIQUE KEY(`place_id`, `language`)
-            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
-            
-            CREATE TABLE `' . _DB_PREFIX_ . 'google_review` (
-                `id` INT(11) AUTO_INCREMENT NOT NULL,
-                `place_id` VARCHAR(255) NOT NULL,
-                `author_name` VARCHAR(255) DEFAULT NULL,
-                `author_url` VARCHAR(255) DEFAULT NULL,
-                `language` VARCHAR(2) NULL,
-                `original_language` VARCHAR(2) DEFAULT NULL,
-                `profile_photo_url` VARCHAR(255) DEFAULT NULL,
-                `rating` SMALLINT DEFAULT NULL,
-                `relative_time_description` VARCHAR(255) DEFAULT NULL,
-                `comment` LONGTEXT DEFAULT NULL,
-                `time` INT DEFAULT NULL,
-                `translated` TINYINT(1) DEFAULT NULL,
-                `enabled` TINYINT(1) DEFAULT NULL,
-                KEY INDEX_PLACE_ID_TIME (`place_id`, `time`),
-                PRIMARY KEY(`id`)
-            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
-        ');
+        try {
+            Db::getInstance()->execute('
+                CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_place` (
+                    `id` INT(11) AUTO_INCREMENT NOT NULL,
+                    `place_id` VARCHAR(255) NOT NULL,
+                    `language` VARCHAR(2) NULL,
+                    `name` VARCHAR(255) NOT NULL,
+                    `phone` VARCHAR(255) DEFAULT NULL,
+                    `opening_hours_periods` TEXT DEFAULT NULL,
+                    `opening_hours_weekday_text` TEXT DEFAULT NULL,
+                    `rating` NUMERIC(4, 2) DEFAULT NULL,
+                    `user_ratings_total` INT DEFAULT NULL,
+                    `price_level` INT DEFAULT NULL,
+                    PRIMARY KEY(`id`),
+                    UNIQUE KEY(`place_id`, `language`)
+                ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
+            ');
+
+            Db::getInstance()->execute('
+                CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'google_review` (
+                    `id` INT(11) AUTO_INCREMENT NOT NULL,
+                    `place_id` VARCHAR(255) NOT NULL,
+                    `author_name` VARCHAR(255) DEFAULT NULL,
+                    `author_url` VARCHAR(255) DEFAULT NULL,
+                    `language` VARCHAR(2) NULL,
+                    `original_language` VARCHAR(2) DEFAULT NULL,
+                    `profile_photo_url` VARCHAR(255) DEFAULT NULL,
+                    `rating` SMALLINT DEFAULT NULL,
+                    `relative_time_description` VARCHAR(255) DEFAULT NULL,
+                    `comment` LONGTEXT DEFAULT NULL,
+                    `time` INT DEFAULT NULL,
+                    `translated` TINYINT(1) DEFAULT NULL,
+                    `enabled` TINYINT(1) DEFAULT NULL,
+                    KEY INDEX_PLACE_ID_TIME (`place_id`, `time`),
+                    PRIMARY KEY(`id`)
+                ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
+            ');
+
+            return true;
+        } catch (Exception $exception) {
+            $this->_errors[] = $exception->getMessage();
+            return false;
+        }
     }
 
     /**
@@ -319,10 +328,15 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     protected function deleteTables(): bool
     {
-        return (bool)Db::getInstance()->execute('
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_place`;
-            DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_review`;
-        ');
+        try {
+            Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_place`;');
+            Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'google_review`;');
+
+            return true;
+        } catch (Exception $exception) {
+            $this->_errors[] = $exception->getMessage();
+            return false;
+        }
     }
 
     /**
