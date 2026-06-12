@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Fix module config redirect URL for Nginx compatibility
+
 ## 1.1.0
 
 - Prestashop 8 compatibility
