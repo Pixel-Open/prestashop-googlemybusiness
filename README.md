@@ -1,6 +1,6 @@
 # Pixel GoogleMyBusiness
 
-[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.2-green)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.4-green)](https://php.net/)
 [![Minimum Prestashop Version](https://img.shields.io/badge/prestashop-%3E%3D%201.7.6.0-green)](https://www.prestashop.com)
 [![GitHub release](https://img.shields.io/github/v/release/Pixel-Open/prestashop-googlemybusiness)](https://github.com/Pixel-Open/prestashop-googlemybusiness/releases)
 
@@ -13,7 +13,7 @@ GoogleMyBusiness is a Prestashop module to import and display any Google place d
 ## Requirements
 
 - Prestashop >= 1.7.6.0
-- PHP >= 7.2.0
+- PHP >= 7.4.0
 
 ## Installation
 
@@ -86,7 +86,11 @@ For example, to display only reviews:
 By default, places and reviews of the current context language are displayed. Use the `lang` widget param (ISO 639-1) to display another language, for example to show the French reviews on every shop language:
 
 ```smarty
-{widget name='pixel_googlemybusiness' display='reviews' lang='fr'}
+{widget name='pixel_googlemybusiness' display='reviews' lang='en'}
+```
+or
+```smarty
+{widget name='pixel_googlemybusiness' display='reviews' lang=$language.iso_code}
 ```
 
 **Place filter:**
