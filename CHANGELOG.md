@@ -1,3 +1,7 @@
+## 1.1.2
+
+- Fix the import place command error with Prestashop 9 (keep compatibility with prestashop 8)
+
 ## 1.1.1
 
 - Fix module config redirect URL for Nginx compatibility
