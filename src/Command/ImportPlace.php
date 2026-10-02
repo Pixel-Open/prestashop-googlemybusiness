@@ -31,7 +31,7 @@ class ImportPlace extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
+     * @return int
      * @throws ORMException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -42,7 +42,7 @@ class ImportPlace extends Command
         $placeIds = Configuration::get('GOOGLE_MY_BUSINESS_PLACE_IDS');
         if (!$placeIds) {
             $output->write('No places to import' . "\n");
-            return;
+            return 0;
         }
         $placeIds = preg_split('/\r\n|[\r\n]/', $placeIds);
         $language = substr($input->getArgument('language'), 0, 2);
@@ -127,6 +127,8 @@ class ImportPlace extends Command
         }
 
         $output->write('Import done!' . "\n");
+
+        return 0;
     }
 
     /**
