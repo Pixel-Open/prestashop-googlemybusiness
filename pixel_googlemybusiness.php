@@ -77,7 +77,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
      */
     public function renderWidget($hookName, array $configuration): string
     {
-        $keys = [$this->name, md5(serialize($configuration))];
+        $keys = [$this->name, $this->getLanguageIso($configuration), md5(serialize($configuration))];
         $cacheId = join('_', $keys);
 
         $template = $configuration['template'] ?? $this->templateFile;
@@ -104,6 +104,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $display = array_filter(
             explode(',', $configuration['display'] ?? 'name,phone,rating,opening-hours,reviews')
         );
+        $language = $this->getLanguageIso($configuration);
         $reviewNumber = $configuration['review_number'] ?? 5;
         $reviewMinRating = $configuration['review_min_rating'] ?? 0;
 
@@ -112,10 +113,25 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 $placeIds,
                 in_array('reviews', $display),
                 (int)$reviewNumber,
-                (int)$reviewMinRating
+                (int)$reviewMinRating,
+                $language
             ),
             'display' => $display,
         ];
+    }
+
+    /**
+     * ISO code of the language to display: the `lang` widget param, or the context language
+     *
+     * @param mixed[] $configuration
+     *
+     * @return string
+     */
+    protected function getLanguageIso(array $configuration): string
+    {
+        $lang = strtolower(substr(trim((string)($configuration['lang'] ?? '')), 0, 2));
+
+        return $lang !== '' ? $lang : $this->context->language->iso_code;
     }
 
     /**
@@ -130,8 +146,11 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         array $placesIds = [],
         bool $loadReviews = true,
         int $reviewNumber = 5,
-        int $reviewMinRating = 0
+        int $reviewMinRating = 0,
+        ?string $language = null
     ): array {
+        $language = $language ?: $this->context->language->iso_code;
+
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
@@ -139,7 +158,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
         $reviewRepository = $entityManager->getRepository(GoogleReview::class);
 
         $criteria = [
-            'language' => [$this->context->language->iso_code, null],
+            'language' => [$language, null],
         ];
         if (!empty($placesIds)) {
             $criteria['placeId']  = $placesIds;
@@ -153,7 +172,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
                 $language = new CompositeExpression(
                     CompositeExpression::TYPE_OR,
                     [
-                        Criteria::expr()->eq('language', $this->context->language->iso_code),
+                        Criteria::expr()->eq('language', $language),
                         Criteria::expr()->eq('language', null)
                     ]
                 );

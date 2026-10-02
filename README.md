@@ -81,6 +81,14 @@ For example, to display only reviews:
 {widget name='pixel_googlemybusiness' display='reviews' review_number=5 review_min_rating=3}
 ```
 
+**Language filter:**
+
+By default, places and reviews of the current context language are displayed. Use the `lang` widget param (ISO 639-1) to display another language, for example to show the French reviews on every shop language:
+
+```smarty
+{widget name='pixel_googlemybusiness' display='reviews' lang='fr'}
+```
+
 **Place filter:**
 
 Filter by place id with the `place_ids` widget param (comma separated):
