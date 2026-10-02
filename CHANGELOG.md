@@ -1,3 +1,8 @@
+## 1.2.0
+
+- Add `lang` widget param to display another language than the context one
+- PHP 7.4 or more is required
+
 ## 1.1.2
 
 - Fix the import place command error with Prestashop 9 (keep compatibility with prestashop 8)
