@@ -22,7 +22,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'pixel_googlemybusiness';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'Pixel Open';
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
@@ -121,7 +121,7 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
     }
 
     /**
-     * ISO code of the language to display: the `lang` widget param, or the context language
+     * Retrieve the language to display
      *
      * @param mixed[] $configuration
      *
@@ -166,20 +166,23 @@ class Pixel_googlemybusiness extends Module implements WidgetInterface
 
         $places = $placeRepository->findBy($criteria);
 
+        if (empty($places)) {
+            unset($criteria['language']);
+            $unique = [];
+            /** @var GooglePlace $place */
+            foreach ($placeRepository->findBy($criteria) as $place) {
+                $unique[$place->getPlaceId()] ??= $place;
+            }
+            $places = array_values($unique);
+        }
+
         if ($loadReviews) {
             /** @var GooglePlace $place */
             foreach ($places as $place) {
-                $language = new CompositeExpression(
-                    CompositeExpression::TYPE_OR,
-                    [
-                        Criteria::expr()->eq('language', $language),
-                        Criteria::expr()->eq('language', null)
-                    ]
-                );
                 $filters = new CompositeExpression(
                     CompositeExpression::TYPE_AND,
                     [
-                        $language,
+                        Criteria::expr()->eq('language', $language),
                         Criteria::expr()->eq('placeId', $place->getPlaceId()),
                         Criteria::expr()->eq('enabled', 1),
                         Criteria::expr()->gte('rating', $reviewMinRating),
